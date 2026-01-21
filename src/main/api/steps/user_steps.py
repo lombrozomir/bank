@@ -1,4 +1,6 @@
 import allure
+from src.main.api.foundation.endpoint import Endpoint
+from src.main.api.foundation.requesters.validate_crud_requester import ValidateCrudRequester
 from src.main.api.models.account_deposit_request import DepositRequest
 from src.main.api.models.account_transfer_request import TransferRequest
 from src.main.api.models.credit_history_response import CreditHistoryResponse
@@ -30,10 +32,20 @@ class UserSteps(BaseSteps):
         req = DepositRequest(accountId=account_id, amount=amount)
         return DepositRequester(request_spec=RequestSpecs.auth_headers(username=create_user_request.username, password=create_user_request.password), response_spec=ResponseSpecs.request_ok()).post(req)
 
+    @allure.step('Deposit invalid')
+    def deposit_invalid(self, create_user_request, account_id: int, amount: float):
+        req = DepositRequest(accountId=account_id, amount=amount)
+        return ValidateCrudRequester(RequestSpecs.auth_headers(create_user_request.username, create_user_request.password), Endpoint.ACCOUNT_DEPOSIT, ResponseSpecs.request_unprocessable()).post(req)
+
     @allure.step('Transfer')
     def transfer(self, create_user_request, from_account_id: int, to_account_id: int, amount: float):
         req = TransferRequest(fromAccountId=from_account_id, toAccountId=to_account_id, amount=amount)
         return TransferRequester(request_spec=RequestSpecs.auth_headers(username=create_user_request.username, password=create_user_request.password), response_spec=ResponseSpecs.request_ok()).post(req)
+
+    @allure.step('Transfer invalid')
+    def transfer_invalid(self, create_user_request, from_account_id: int, to_account_id: int, amount: float):
+        req = TransferRequest(fromAccountId=from_account_id, toAccountId=to_account_id, amount=amount)
+        return ValidateCrudRequester(RequestSpecs.auth_headers(create_user_request.username, create_user_request.password), Endpoint.ACCOUNT_TRANSFER, ResponseSpecs.request_unprocessable()).post(req)
 
     @allure.step('Get transactions')
     def transactions(self, create_user_request, account_id: int) -> AccountTransactionsResponse:
@@ -44,10 +56,25 @@ class UserSteps(BaseSteps):
         req = CreditRequest(accountId=account_id, amount=amount, termMonths=term_months)
         return CreditRequestRequester(request_spec=RequestSpecs.auth_headers(username=create_user_request.username, password=create_user_request.password), response_spec=ResponseSpecs.request_created()).post(req)
 
+    @allure.step('Credit request forbidden')
+    def credit_request_forbidden(self, create_user_request, account_id: int, amount: float, term_months: int):
+        req = CreditRequest(accountId=account_id, amount=amount, termMonths=term_months)
+        return ValidateCrudRequester(RequestSpecs.auth_headers(create_user_request.username, create_user_request.password), Endpoint.CREDIT_REQUEST, ResponseSpecs.request_forbidden()).post(req)
+
+    @allure.step('Credit request invalid')
+    def credit_request_invalid(self, create_user_request, account_id: int, amount: float, term_months: int):
+        req = CreditRequest(accountId=account_id, amount=amount, termMonths=term_months)
+        return ValidateCrudRequester(RequestSpecs.auth_headers(create_user_request.username, create_user_request.password), Endpoint.CREDIT_REQUEST, ResponseSpecs.request_unprocessable()).post(req)
+
     @allure.step('Credit repay')
     def credit_repay(self, create_user_request, credit_id: int, account_id: int, amount: float) -> CreditRepayResponse:
         req = CreditRepayRequest(creditId=credit_id, accountId=account_id, amount=amount)
         return CreditRepayRequester(request_spec=RequestSpecs.auth_headers(username=create_user_request.username, password=create_user_request.password), response_spec=ResponseSpecs.request_ok()).post(req)
+
+    @allure.step('Credit repay invalid')
+    def credit_repay_invalid(self, create_user_request, credit_id: int, account_id: int, amount: float):
+        req = CreditRepayRequest(creditId=credit_id, accountId=account_id, amount=amount)
+        return ValidateCrudRequester(RequestSpecs.auth_headers(create_user_request.username, create_user_request.password), Endpoint.CREDIT_REPAY, ResponseSpecs.request_unprocessable()).post(req)
 
     @allure.step('Credit history')
     def credit_history(self, create_user_request) -> CreditHistoryResponse:

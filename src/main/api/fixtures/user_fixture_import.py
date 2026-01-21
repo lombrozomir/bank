@@ -34,3 +34,13 @@ def credit_user_account(api_manager, credit_user_request):
 def active_credit(api_manager, credit_user_request, credit_user_account):
     credit = api_manager.user_steps.credit_request(credit_user_request, credit_user_account.id, 5000, 12)
     return (credit_user_request, credit_user_account, credit)
+
+
+@pytest.fixture
+def transfer_between_own_accounts(api_manager, create_user_request, user_two_accounts):
+    a1, a2 = user_two_accounts
+    api_manager.user_steps.deposit(create_user_request, account_id=a1.id, amount=2000)
+    api_manager.user_steps.transfer(create_user_request, from_account_id=a1.id, to_account_id=a2.id, amount=500)
+    trx1 = api_manager.user_steps.transactions(create_user_request, account_id=a1.id)
+    trx2 = api_manager.user_steps.transactions(create_user_request, account_id=a2.id)
+    return (trx1, trx2)

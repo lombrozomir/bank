@@ -1,4 +1,5 @@
 from typing import Optional
+import allure
 from src.main.api.foundation.http_requester import HttpRequester
 from src.main.api.foundation.requesters.crud_requester import CrudRequester
 from src.main.api.models.base_model import BaseModel
@@ -10,16 +11,19 @@ class ValidateCrudRequester(HttpRequester):
         self.crud_requester = CrudRequester(request_spec=request_spec, endpoint=endpoint, response_spec=response_spec)
 
     def post(self, model: Optional[BaseModel]=None) -> Optional[BaseModel]:
-        response = self.crud_requester.post(model)
-        self.response_spec(response)
-        return self.endpoint.value.response_model.model_validate(response.json())
+        with allure.step(f'POST {self.endpoint.value.url}'):
+            response = self.crud_requester.post(model)
+            self.response_spec(response)
+            return self.endpoint.value.response_model.model_validate(response.json())
 
     def delete(self, user_id: int):
-        response = self.crud_requester.delete(user_id)
-        self.response_spec(response)
-        return self.endpoint.value.response_model.model_validate(response.json())
+        with allure.step(f'DELETE {self.endpoint.value.url}/{user_id}'):
+            response = self.crud_requester.delete(user_id)
+            self.response_spec(response)
+            return self.endpoint.value.response_model.model_validate(response.json())
 
     def get(self, path_suffix: str=''):
-        response = self.crud_requester.get(path_suffix)
-        self.response_spec(response)
-        return self.endpoint.value.response_model.model_validate(response.json())
+        with allure.step(f'GET {self.endpoint.value.url}{path_suffix}'):
+            response = self.crud_requester.get(path_suffix)
+            self.response_spec(response)
+            return self.endpoint.value.response_model.model_validate(response.json())

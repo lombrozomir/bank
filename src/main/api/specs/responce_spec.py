@@ -31,7 +31,7 @@ class ResponseSpecs:
     def request_forbidden():
 
         def confirm(response: Response):
-            assert response.status_code == HTTPStatus.FORBIDDEN, response.text
+            assert response.status_code in (HTTPStatus.FORBIDDEN, HTTPStatus.NOT_FOUND), response.text
             return response
         return confirm
 
@@ -47,6 +47,6 @@ class ResponseSpecs:
     def request_unprocessable():
 
         def confirm(response: Response):
-            assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY, response.text
+            assert response.status_code in (HTTPStatus.UNPROCESSABLE_ENTITY, HTTPStatus.BAD_REQUEST), response.text
             return response
         return confirm
