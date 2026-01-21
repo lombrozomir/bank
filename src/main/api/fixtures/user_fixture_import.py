@@ -28,3 +28,9 @@ def user_two_accounts(api_manager, create_user_request):
 @pytest.fixture
 def credit_user_account(api_manager, credit_user_request):
     return api_manager.user_steps.create_account(credit_user_request)
+
+
+@pytest.fixture
+def active_credit(api_manager, credit_user_request, credit_user_account):
+    credit = api_manager.user_steps.credit_request(credit_user_request, credit_user_account.id, 5000, 12)
+    return (credit_user_request, credit_user_account, credit)

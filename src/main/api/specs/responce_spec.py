@@ -26,3 +26,27 @@ class ResponseSpecs:
             assert response.status_code == HTTPStatus.BAD_REQUEST, response.text
             return response
         return confirm
+
+    @staticmethod
+    def request_forbidden():
+
+        def confirm(response: Response):
+            assert response.status_code == HTTPStatus.FORBIDDEN, response.text
+            return response
+        return confirm
+
+    @staticmethod
+    def request_conflict():
+
+        def confirm(response: Response):
+            assert response.status_code == HTTPStatus.CONFLICT, response.text
+            return response
+        return confirm
+
+    @staticmethod
+    def request_unprocessable():
+
+        def confirm(response: Response):
+            assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY, response.text
+            return response
+        return confirm
